@@ -1,2 +1,4 @@
-# kit-exts-joints
- Creating Joint Connection Tool in Omniverse
+# Create Joints in Omniverse
+
+![](./images/createJointext.PNG)
+
