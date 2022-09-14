@@ -3,8 +3,8 @@
 version = "1.0.0"
 
 # The title and description fields are primarily for displaying extension info in UI
-title = "Simple UI Extension Template"
-description="The simplest python extension example. Use it as a starting point for your extensions."
+title = "Joint Creation"
+description="This extension provides an easy and efficient way to select Prims and connect with any type of Joint."
 
 # Path (relative to the root) or content of readme markdown file for UI.
 readme  = "docs/README.md"

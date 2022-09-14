@@ -1,7 +1,10 @@
 import omni.ui as ui
 from .utils import get_selection
-# from .combo_box_model import ComboBoxModel
-from pxr import Usd
+import omni.kit.commands
+import omni.usd
+
+
+JOINTS = ("D6", "Revolute", "Fixed", "Spherical", "Prismatic", "Distance", "Gear", "Rack and Pinion")
 
 class JointWindow(ui.Window):
     
@@ -10,8 +13,10 @@ class JointWindow(ui.Window):
         
         self._source_prim_model_a = ui.SimpleStringModel()
         self._source_prim_model_b = ui.SimpleStringModel()
-        
+        self._stage = omni.usd.get_context().get_stage()
         self.frame.set_build_fn(self._build_fn)
+        self.combo_model = None
+        self.current_joint = None
         
     def _on_get_selection_a(self):
         """Called when the user presses the "Get From Selection" button"""
@@ -42,17 +47,24 @@ class JointWindow(ui.Window):
                 with ui.CollapsableFrame("Joints"):
                     with ui.VStack():
                         ui.Label
-                        ui.ComboBox(1,"Revolute", "Blah2", "Blah3")
+                        self.combo_model = ui.ComboBox(0,*JOINTS).model
                         
-                        
-                        joint_type='Revolute',
-                        
-                        import omni.kit.commands
-                    
+                        def combo_changed(item_model, item):
+                            value_model = item_model.get_item_value_model(item)
+                            self.current_joint = JOINTS[value_model.as_int]
+                            # self.current_index = value_model.as_int
+                        self._combo_changed_sub = self.combo_model.subscribe_item_changed_fn(combo_changed)                    
+                                
 
                 def on_click():
                     print("clicked!")
-                    
+                   
+                    omni.kit.commands.execute('CreateJointCommand',
+                        stage = self._stage,                      
+                        joint_type=self.current_joint,
+                        from_prim = self._stage.GetPrimAtPath(self._source_prim_model_a.as_string),
+                        to_prim = self._stage.GetPrimAtPath(self._source_prim_model_b.as_string))
+
                 ui.Button("Create Joint", clicked_fn=lambda: on_click())
                          
     def _build_fn(self):
@@ -61,4 +73,5 @@ class JointWindow(ui.Window):
                 self._build_window()
                 
     def destroy(self) -> None:
+        self._combo_changed_sub = None
         return super().destroy()                       
